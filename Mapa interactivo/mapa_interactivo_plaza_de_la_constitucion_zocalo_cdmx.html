@@ -1,0 +1,262 @@
+<!doctype html>
+<!-- Archivo: index.html -->
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Mapa interactivo — Plaza de la Constitución (Zócalo CDMX)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Leaflet CSS -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f4f4f4;
+    }
+    header {
+      background: #1f2937;
+      color: white;
+      padding: 1rem;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 1.4rem;
+    }
+    header p {
+      margin: 0.3rem 0 0;
+      font-size: 0.95rem;
+      opacity: 0.9;
+    }
+    #container {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      height: calc(100vh - 96px);
+    }
+    #map {
+      width: 100%;
+      height: 100%;
+    }
+    #info {
+      background: white;
+      padding: 1rem;
+      overflow-y: auto;
+      border-left: 1px solid #ddd;
+    }
+    h2 {
+      font-size: 1.1rem;
+      margin-top: 1rem;
+      border-bottom: 2px solid #e5e7eb;
+      padding-bottom: 0.3rem;
+    }
+    ul {
+      padding-left: 1.2rem;
+    }
+    li {
+      margin-bottom: 0.4rem;
+    }
+    .tag {
+      display: inline-block;
+      background: #e5e7eb;
+      padding: 0.2rem 0.5rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      margin-right: 0.3rem;
+      margin-top: 0.3rem;
+    }
+    footer {
+      background: #e5e7eb;
+      padding: 0.6rem 1rem;
+      font-size: 0.85rem;
+      text-align: center;
+    }
+
+    @media (max-width: 900px) {
+      #container {
+        grid-template-columns: 1fr;
+        grid-template-rows: 60vh auto;
+      }
+      #info {
+        border-left: none;
+        border-top: 1px solid #ddd;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Plaza de la Constitución (Zócalo CDMX)</h1>
+  <p>Mapa interactivo y esquema turístico del principal espacio histórico de México</p>
+</header>
+
+<div id="container">
+  <div id="map"></div>
+
+  <aside id="info">
+    <h2>1. Ubicación exacta</h2>
+    <p><strong>Nombre oficial:</strong> Plaza de la Constitución</p>
+    <p><strong>Estado:</strong> Ciudad de México</p>
+    <p><strong>Alcaldía:</strong> Cuauhtémoc</p>
+    <p><strong>Coordenadas:</strong> 19.4326° N, 99.1332° W</p>
+    <p>
+      Es la plaza principal del país y uno de los centros culturales, históricos y
+      políticos más importantes de México.
+    </p>
+
+    <h2>2. Recursos turísticos</h2>
+    <strong>Atractivos principales</strong>
+    <ul>
+      <li>Catedral Metropolitana de la Ciudad de México</li>
+      <li>Palacio Nacional y murales de Diego Rivera</li>
+      <li>Templo Mayor y su museo</li>
+      <li>Antiguo Palacio del Ayuntamiento</li>
+      <li>Gran Hotel de la Ciudad de México (vidriera Art Nouveau)</li>
+      <li>Calles comerciales: Madero, 5 de Mayo y Tacuba</li>
+    </ul>
+
+    <strong>Infraestructura</strong>
+    <ul>
+      <li>Accesos peatonales amplios</li>
+      <li>Metro Línea 2 — Estación Zócalo/Tenochtitlan</li>
+      <li>Líneas de Metrobús cercanas</li>
+      <li>Hoteles de diferentes categorías</li>
+      <li>Restaurantes, cafeterías y terrazas panorámicas</li>
+      <li>Oficinas de gobierno y seguridad pública</li>
+      <li>Señalética turística y módulos de información</li>
+    </ul>
+
+    <h2>Planta turística</h2>
+    <ul>
+      <li>Hoteles 3, 4 y 5 estrellas (Zócalo Central, Gran Hotel CDMX, Hotel Majestic)</li>
+      <li>Restaurantes emblemáticos (Azul Histórico, Balcón del Zócalo, El Mayor)</li>
+      <li>Museos cercanos: Templo Mayor, Museo de la Ciudad, Palacio de Cultura Banamex</li>
+    </ul>
+
+    <h2>3. Modelo funcional (Miossec)</h2>
+    <p>
+      El Zócalo de la Ciudad de México se ubica en la <strong>Fase 4</strong> del modelo de
+      Miossec, correspondiente a un espacio turístico plenamente desarrollado,
+      con alta concentración de servicios, conectividad, flujos turísticos
+      intensos y fuerte proyección nacional e internacional.
+    </p>
+    <div>
+      <span class="tag">Alta accesibilidad</span>
+      <span class="tag">Servicios consolidados</span>
+      <span class="tag">Turismo masivo</span>
+    </div>
+
+    <h2>4. Complejo turístico</h2>
+    <p>
+      El Zócalo se considera un complejo turístico clave porque concentra un alto
+      valor histórico y simbólico, conecta más de 100 edificios históricos en pocas
+      cuadras, recibe miles de visitantes diariamente, alberga eventos masivos y
+      funciona como eje articulador de la movilidad turística del Centro Histórico,
+      reconocido por la UNESCO como Patrimonio de la Humanidad.
+    </p>
+  </aside>
+</div>
+
+<footer>
+  Elaborado con fines académicos — Mapa interactivo del Centro Histórico de la CDMX
+</footer>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  // Coordenadas del Zócalo
+  const zocalo = [19.4326, -99.1332];
+
+  // Inicializar mapa
+  const map = L.map('map').setView(zocalo, 17);
+
+  // Capa base
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '© OpenStreetMap'
+  }).addTo(map);
+
+  // Marcador principal
+  L.marker(zocalo)
+    .addTo(map)
+    .bindPopup('<strong>Plaza de la Constitución</strong><br>Zócalo CDMX');
+
+  // Puntos turísticos cercanos
+  const puntos = [
+    // Restaurantes
+    { nombre: 'Balcón del Zócalo', coord: [19.4325, -99.1333], tipo: 'restaurante' },
+    { nombre: 'El Mayor (Terraza)', coord: [19.4333, -99.1303], tipo: 'restaurante' },
+    { nombre: 'La Casa de las Sirenas', coord: [19.4333, -99.1311], tipo: 'restaurante' },
+    { nombre: 'Azul Histórico', coord: [19.4342, -99.1381], tipo: 'restaurante' },
+    { nombre: 'Café Tacuba', coord: [19.4358, -99.1378], tipo: 'restaurante' },
+    { nombre: 'Limosneros', coord: [19.4356, -99.1386], tipo: 'restaurante' },
+    { nombre: 'El Cardenal (Palma)', coord: [19.4364, -99.1400], tipo: 'restaurante' },
+
+    // Sitios históricos y hoteles
+    { nombre: 'Catedral Metropolitana', coord: [19.4331, -99.1333], tipo: 'historico' },
+    { nombre: 'Templo Mayor y Museo', coord: [19.4344, -99.1319], tipo: 'historico' },
+    { nombre: 'Gran Hotel de la Ciudad de México', coord: [19.4317, -99.1339], tipo: 'hotel' },
+    { nombre: 'Hotel Zócalo Central', coord: [19.4328, -99.1336], tipo: 'hotel' },
+    { nombre: 'Hotel Majestic', coord: [19.4320, -99.1336], tipo: 'hotel' },
+    { nombre: 'Palacio Postal', coord: [19.4350, -99.1400], tipo: 'historico' },
+
+    // Transporte y calles
+    { nombre: 'Metro Zócalo / Tenochtitlan', coord: [19.4328, -99.1331], tipo: 'transporte' },
+    { nombre: 'Av. Francisco I. Madero (Inicio)', coord: [19.4328, -99.1347], tipo: 'transporte' },
+    { nombre: 'Calle 5 de Mayo (Inicio)', coord: [19.4333, -99.1342], tipo: 'transporte' },
+    { nombre: 'Calle Tacuba (Inicio)', coord: [19.4344, -99.1342], tipo: 'transporte' },
+
+    // Poderes de la Unión
+    { nombre: 'Palacio Nacional (Poder Ejecutivo)', coord: [19.4320, -99.1308], tipo: 'gobierno' },
+    { nombre: 'Antiguo Palacio del Ayuntamiento', coord: [19.4317, -99.1328], tipo: 'gobierno' },
+    { nombre: 'SCJN (Poder Judicial)', coord: [19.4303, -99.1333], tipo: 'gobierno' }
+  ];
+
+  const estilos = {
+    restaurante: { color: '#e11d48', fillColor: '#f43f5e' },
+    hotel: { color: '#2563eb', fillColor: '#3b82f6' },
+    historico: { color: '#059669', fillColor: '#10b981' },
+    transporte: { color: '#7c3aed', fillColor: '#8b5cf6' },
+    gobierno: { color: '#d97706', fillColor: '#f59e0b' }
+  };
+
+  puntos.forEach(p => {
+    const estilo = estilos[p.tipo];
+    L.circleMarker(p.coord, {
+      radius: 7,
+      color: estilo.color,
+      fillColor: estilo.fillColor,
+      fillOpacity: 0.85
+    }).addTo(map).bindPopup(`<strong>${p.nombre}</strong><br>${p.tipo.toUpperCase()}`);
+  });
+
+  // Leyenda turística
+  const legend = L.control({ position: 'bottomright' });
+
+  legend.onAdd = function () {
+    const div = L.DomUtil.create('div', 'info legend');
+    div.style.background = 'white';
+    div.style.padding = '8px';
+    div.style.fontSize = '0.85rem';
+    div.style.border = '1px solid #ccc';
+
+    div.innerHTML = `
+      <strong>Leyenda turística</strong><br>
+      <span style="color:#e11d48">●</span> Restaurantes<br>
+      <span style="color:#2563eb">●</span> Hoteles<br>
+      <span style="color:#059669">●</span> Sitios históricos<br>
+      <span style="color:#7c3aed">●</span> Transporte y calles<br>
+      <span style="color:#d97706">●</span> Gobierno
+    `;
+    return div;
+  };
+
+  legend.addTo(map);
+</script>
+
+</body>
+</html>
